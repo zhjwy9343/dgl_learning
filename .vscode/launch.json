@@ -8,7 +8,7 @@
         {
             "name": "Python: 远程连接",
             "type": "python",
-            "pythonPath": "/home/ubuntu/anaconda3/envs/xc_dgl/bin/python3.7",
+            "python": "/home/ubuntu/anaconda3/envs/xc_dgl/bin/python3.7",
             "request": "attach",
             "connect": {
                 "host": "54.162.145.208",
