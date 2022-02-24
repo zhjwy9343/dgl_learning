@@ -12,7 +12,6 @@ Pytorch implementation: https://github.com/Diego999/pyGAT
 
 import numpy as np
 import torch
-
 import dgl
 import torch.nn.functional as F
 import argparse
