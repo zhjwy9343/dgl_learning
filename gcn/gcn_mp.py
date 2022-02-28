@@ -17,16 +17,16 @@ from dgl.data import CoraGraphDataset, CiteseerGraphDataset, PubmedGraphDataset
 
 # GCNLayer.g.update_all(gcn_msg, gcn_reduce, self.node_update)  message passing, aggregate, update 
 
-
 #TODO should == D^(-1/2) * A * D^(-1/2) * H , src = u, des = v, 更新des的hidden by \sigma u frac{ h_u }{deg(u) * deg(v)}? 
 
 def gcn_msg(edge):
-    msg = edge.src['h'] * edge.src['norm'] # u_nrom 
+    msg = edge.src['h'] * edge.src['norm'] # u_nrom , norm = 根号in_degreee, 也就是D^(-1/2)中u对应的对角线元素（D是对角矩阵） 
+    # 注意加入了self loop， 所以src中也有v本身
     return {'m': msg}
 
 
 def gcn_reduce(node):
-    accum = torch.sum(node.mailbox['m'], 1) * node.data['norm']  # v_nrom # TODO node.mailbox['m'] 是聚合来的msg
+    accum = torch.sum(node.mailbox['m'], 1) * node.data['norm']  # v_nrom ， node.mailbox['m'] 是聚合来的msg
     return {'h': accum}
 
 
