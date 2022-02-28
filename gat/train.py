@@ -19,7 +19,7 @@ from dgl.data import register_data_args
 from dgl.data import CoraGraphDataset, CiteseerGraphDataset, PubmedGraphDataset
 
 from gat import GAT
-from utils import EarlyStopping
+from gat.utils import EarlyStopping
 
 
 def accuracy(logits, labels):

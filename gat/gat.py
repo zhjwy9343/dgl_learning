@@ -48,12 +48,14 @@ class GAT(nn.Module):
         # output projection
         self.gat_layers.append(GATConv(
             num_hidden * heads[-2], num_classes, heads[-1],
-            feat_drop, attn_drop, negative_slope, residual, None))
+            feat_drop, attn_drop, negative_slope, residual, None)) # last layer no self.activation
 
     def forward(self, inputs):
         h = inputs
         for l in range(self.num_layers):
-            h = self.gat_layers[l](self.g, h).flatten(1)
+            t = self.gat_layers[l](self.g, h)
+            h = t.flatten(1) # flatten(1) 将输入扁平化但保留batch_size,假设第一维是batch。 
+            # TODO flatten(1) 1不指定就是start dim
         # output projection
         logits = self.gat_layers[-1](self.g, h).mean(1)
         return logits
