@@ -3,7 +3,6 @@ import torch as th
 import torch.nn as nn
 import torch.nn.functional as F
 import dgl
-
 from dgl.nn.pytorch import RelGraphConv
 
 class RGCN(nn.Module):
@@ -23,6 +22,7 @@ class RGCN(nn.Module):
                                         dropout=dropout))
 
         # For entity classification, dropout should not be applied to the output layer
+        # TODO entity classification is what kind of a task? 
         if not link_pred:
             dropout = 0.
         self.layers.append(RelGraphConv(h_dim, out_dim, num_rels, regularizer,
@@ -30,7 +30,7 @@ class RGCN(nn.Module):
 
     def forward(self, g, h):
         if isinstance(g, DGLGraph):
-            blocks = [g] * len(self.layers)
+            blocks = [g] * len(self.layers) # TODO if its not dglGraph, blocks 怎么 zip?
         else:
             blocks = g
 

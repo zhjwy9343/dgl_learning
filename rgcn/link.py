@@ -19,14 +19,14 @@ from model import RGCN
 class LinkPredict(nn.Module):
     def __init__(self, in_dim, num_rels, h_dim=500, num_bases=100, dropout=0.2, reg_param=0.01):
         super(LinkPredict, self).__init__()
-        self.rgcn = RGCN(in_dim, h_dim, h_dim, num_rels * 2, regularizer="bdd",
+        self.rgcn = RGCN(in_dim, h_dim, h_dim, num_rels * 2, regularizer="bdd", # 2 layers 
                          num_bases=num_bases, dropout=dropout, self_loop=True, link_pred=True)
         self.reg_param = reg_param
         self.w_relation = nn.Parameter(th.Tensor(num_rels, h_dim))
         nn.init.xavier_uniform_(self.w_relation,
                                 gain=nn.init.calculate_gain('relu'))
 
-    def calc_score(self, embedding, triplets):
+    def calc_score(self, embedding, triplets): # each row in the triplets is a 3-tuple of (source, relation, destination)
         # DistMult
         s = embedding[triplets[:,0]]
         r = self.w_relation[triplets[:,1]]
@@ -54,7 +54,7 @@ def main(args):
     num_rels = data.num_rels
 
     train_g, test_g = preprocess(graph, num_rels)
-    test_node_id = th.arange(0, num_nodes).view(-1, 1)
+    test_node_id = th.arange(0, num_nodes).view(-1, 1) # generate ids
     test_mask = graph.edata['test_mask']
     subg_iter = SubgraphIterator(train_g, num_rels, args.edge_sampler)
     dataloader = GraphDataLoader(subg_iter, batch_size=1, collate_fn=lambda x: x[0])
@@ -74,7 +74,7 @@ def main(args):
 
     best_mrr = 0
     model_state_file = 'model_state.pth'
-    for epoch, batch_data in enumerate(dataloader):
+    for epoch, batch_data in enumerate(dataloader): # batch data 是一个子图
         model.train()
 
         g, node_id, data, labels = batch_data
