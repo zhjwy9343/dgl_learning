@@ -16,7 +16,7 @@ from entity_utils import load_data
 from model import RelGraphEmbedLayer, RGCN
 
 def init_dataloaders(args, g, train_idx, test_idx, target_idx, device, use_ddp=False):
-    fanouts = [int(fanout) for fanout in args.fanout.split(',')]
+    fanouts = [int(fanout) for fanout in args.fanout.split(',')] # default = 4， 4
     sampler = MultiLayerNeighborSampler(fanouts)
 
     train_loader = NodeDataLoader(
@@ -131,13 +131,14 @@ def main(args):
 
     train_loader, val_loader, test_loader = init_dataloaders(
         args, g, train_idx, test_idx, target_idx, args.gpu)
+
     embed_layer, model = init_models(args, device, g.num_nodes(), num_classes, num_rels)
 
     labels = labels.to(device)
     model = model.to(device)
 
     emb_optimizer = th.optim.SparseAdam(embed_layer.parameters(), lr=args.sparse_lr)
-    optimizer = th.optim.Adam(model.parameters(), lr=1e-2, weight_decay=args.l2norm)
+    optimizer = th.optim.Adam(model.parameters(), lr=1e-2, weight_decay=args.l2norm) # TODO 2 optimizers? why? 
 
     for epoch in range(args.n_epochs):
         train_acc, loss = train(model, embed_layer, train_loader, inv_target,

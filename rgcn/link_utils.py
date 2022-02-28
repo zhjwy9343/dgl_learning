@@ -30,12 +30,13 @@ def preprocess(g, num_rels):
     train_g = get_subset_g(g, g.edata['train_mask'], num_rels)
 
     # Get test graph
+    # note: link prediction‘s test results
     test_g = get_subset_g(g, g.edata['train_mask'], num_rels, bidirected=True)
-    test_g.edata['norm'] = dgl.norm_by_dst(test_g).unsqueeze(-1)
+    test_g.edata['norm'] = dgl.norm_by_dst(test_g).unsqueeze(-1) # mask the edge features 
 
     return train_g, test_g
 
-class GlobalUniform:
+class GlobalUniform: # 随意sample点
     def __init__(self, g, sample_size):
         self.sample_size = sample_size
         self.eids = np.arange(g.num_edges())
@@ -162,9 +163,10 @@ class SubgraphIterator:
 
         return sub_g, uniq_v, samples, labels
 
-# Utility functions for evaluations (raw)
 
+# Utility functions for evaluations (raw)
 def perturb_and_get_raw_rank(emb, w, a, r, b, test_size, batch_size=100):
+    # (emb, w, o, r, s, test_size, batch_size)
     """ Perturb one element in the triplets"""
     n_batch = (test_size + batch_size - 1) // batch_size
     ranks = []
@@ -177,7 +179,9 @@ def perturb_and_get_raw_rank(emb, w, a, r, b, test_size, batch_size=100):
         batch_a = a[batch_start: batch_end]
         batch_r = r[batch_start: batch_end]
         emb_ar = emb[:,batch_a] * w[:,batch_r] # size D x E
+        # source embedding
         emb_ar = emb_ar.unsqueeze(2)           # size D x E x 1
+        # relation embedding
         emb_c = emb.unsqueeze(1)               # size D x 1 x V
 
         # out-prod and reduce sum
@@ -185,6 +189,7 @@ def perturb_and_get_raw_rank(emb, w, a, r, b, test_size, batch_size=100):
         score = th.sum(out_prod, dim=0).sigmoid() # size E x V
         target = b[batch_start: batch_end]
 
+        # indices 是由 source embedding和 relation embedding计算出的target ids
         _, indices = th.sort(score, dim=1, descending=True)
         indices = th.nonzero(indices == target.view(-1, 1), as_tuple=False)
         ranks.append(indices[:, 1].view(-1))
