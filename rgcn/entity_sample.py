@@ -7,17 +7,15 @@ import argparse
 import torch as th
 import torch.nn.functional as F
 import dgl
-
 from dgl.dataloading import MultiLayerNeighborSampler, NodeDataLoader
 from torchmetrics.functional import accuracy
 from tqdm import tqdm
-
 from entity_utils import load_data
 from model import RelGraphEmbedLayer, RGCN
 
 def init_dataloaders(args, g, train_idx, test_idx, target_idx, device, use_ddp=False):
     fanouts = [int(fanout) for fanout in args.fanout.split(',')] # default = 4， 4
-    sampler = MultiLayerNeighborSampler(fanouts)
+    sampler = MultiLayerNeighborSampler(fanouts) # fanouts是NN的层数
 
     train_loader = NodeDataLoader(
         g,
@@ -87,7 +85,7 @@ def train(model, embed_layer, train_loader, inv_target,
 
     for sample_data in train_loader:
         seeds, blocks = process_batch(inv_target, sample_data)
-        feats = embed_layer(blocks[0].srcdata[dgl.NID].cpu())
+        feats = embed_layer(blocks[0].srcdata[dgl.NID].cpu()) # TODO why cpu? 
         logits = model(blocks, feats)
         loss = F.cross_entropy(logits, labels[seeds])
         emb_optimizer.zero_grad()
@@ -138,7 +136,8 @@ def main(args):
     model = model.to(device)
 
     emb_optimizer = th.optim.SparseAdam(embed_layer.parameters(), lr=args.sparse_lr)
-    optimizer = th.optim.Adam(model.parameters(), lr=1e-2, weight_decay=args.l2norm) # TODO 2 optimizers? why? 
+    optimizer = th.optim.Adam(model.parameters(), lr=1e-2, weight_decay=args.l2norm) 
+    # TODO 2 optimizers? why? 
 
     for epoch in range(args.n_epochs):
         train_acc, loss = train(model, embed_layer, train_loader, inv_target,

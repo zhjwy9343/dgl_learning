@@ -30,7 +30,7 @@ class RGCN(nn.Module):
 
     def forward(self, g, h):
         if isinstance(g, DGLGraph):
-            blocks = [g] * len(self.layers) # TODO if its not dglGraph, blocks 怎么 zip?
+            blocks = [g] * len(self.layers) # TODO if its not dglGraph 怎么 zip?
         else:
             blocks = g
 

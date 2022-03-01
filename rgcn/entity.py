@@ -3,13 +3,10 @@ Differences compared to tkipf/relation-gcn
 * l2norm applied to all weights
 * remove nodes that won't be touched
 """
-
 import argparse
 import torch as th
 import torch.nn.functional as F
-
 from torchmetrics.functional import accuracy
-
 from entity_utils import load_data
 from model import RGCN
 
@@ -62,7 +59,7 @@ def main(args):
     print("Test Accuracy: {:.4f}".format(test_acc))
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='RGCN for entity classification')
+    parser = argparse.ArgumentParser(description='RGCN for entity classification') # node classification 
     parser.add_argument("--n-hidden", type=int, default=16,
                         help="number of hidden units")
     parser.add_argument("--gpu", type=int, default=-1,
