@@ -51,9 +51,9 @@ def main(args):
     data = FB15k237Dataset(reverse=False)
     graph = data[0]
     num_nodes = graph.num_nodes()
-    num_rels = data.num_rels
+    num_rels = data.num_rels # TODO num_rels 是啥？
 
-    train_g, test_g = preprocess(graph, num_rels)
+    train_g, test_g = preprocess(graph, num_rels) # get train and test data( mask the test edge feature)
     test_node_id = th.arange(0, num_nodes).view(-1, 1) # generate ids
     test_mask = graph.edata['test_mask']
     subg_iter = SubgraphIterator(train_g, num_rels, args.edge_sampler)

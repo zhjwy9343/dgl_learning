@@ -52,7 +52,7 @@ def load_data(data_name, get_norm=False, inv_target=False):
         # looking up type-specific labels in a minibatch
         inv_target = th.empty((g.num_nodes(),), dtype=th.int64)
         inv_target[target_idx] = th.arange(0, target_idx.shape[0],
-                                           dtype=inv_target.dtype)
+                                           dtype=inv_target.dtype) # torch.Size([7262]), 重排target_idx
         return g, num_rels, num_classes, labels, train_idx, test_idx, target_idx, inv_target
     else:
         return g, num_rels, num_classes, labels, train_idx, test_idx, target_idx

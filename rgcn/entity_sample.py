@@ -71,7 +71,7 @@ def process_batch(inv_target, batch):
     _, seeds, blocks = batch
     # map the seed nodes back to their type-specific ids,
     # in order to get the target node labels
-    seeds = inv_target[seeds]
+    seeds = inv_target[seeds] # torch.Size([100])
 
     for blc in blocks:
         blc.edata['norm'] = dgl.norm_by_dst(blc).unsqueeze(1)
@@ -168,8 +168,8 @@ if __name__ == '__main__':
                         help="number of filter weight matrices, default: -1 [use all]")
     parser.add_argument("--n-epochs", type=int, default=50,
                         help="number of training epochs")
-    parser.add_argument("-d", "--dataset", type=str, required=True,
-                        choices=['aifb', 'mutag', 'bgs', 'am'],
+    parser.add_argument("-d", "--dataset", type=str, # required=True,
+                        choices=['aifb', 'mutag', 'bgs', 'am'], default='aifb',
                         help="dataset to use")
     parser.add_argument("--l2norm", type=float, default=5e-4,
                         help="l2 norm coef")
@@ -179,6 +179,7 @@ if __name__ == '__main__':
                         help="include self feature as a special relation")
     parser.add_argument("--batch-size", type=int, default=100,
                         help="Mini-batch size")
+    
     args = parser.parse_args()
 
     print(args)
