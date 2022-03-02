@@ -83,9 +83,9 @@ def train(model, embed_layer, train_loader, inv_target,
     model.train()
     embed_layer.train()
 
-    for sample_data in train_loader:
+    for sample_data in train_loader: # sample_data = _, seeds, blocks (seeds 即 target )
         seeds, blocks = process_batch(inv_target, sample_data)
-        feats = embed_layer(blocks[0].srcdata[dgl.NID].cpu()) # TODO why cpu? 
+        feats = embed_layer(blocks[0].srcdata[dgl.NID].cpu()) # embed layer 不需要加速计算（按位索引即可，所以放在cpu里） 
         logits = model(blocks, feats)
         loss = F.cross_entropy(logits, labels[seeds])
         emb_optimizer.zero_grad()
