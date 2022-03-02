@@ -30,6 +30,7 @@ def main(args):
         device = th.device(args.gpu)
     else:
         device = th.device('cpu')
+    
     feats = feats.to(device)
     labels = labels.to(device)
     model = model.to(device)

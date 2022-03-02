@@ -16,7 +16,7 @@ def load_data(data_name, get_norm=False, inv_target=False):
     # Load hetero-graph
     hg = dataset[0]
 
-    num_rels = len(hg.canonical_etypes)
+    num_rels = len(hg.canonical_etypes) # 规范type
     category = dataset.predict_category
     num_classes = dataset.num_classes
     labels = hg.nodes[category].data.pop('labels')
@@ -35,7 +35,7 @@ def load_data(data_name, get_norm=False, inv_target=False):
         edata = None
 
     # get target category id
-    category_id = hg.ntypes.index(category)
+    category_id = hg.ntypes.index(category) #node types 
 
     g = dgl.to_homogeneous(hg, edata=edata)
     # Rename the fields as they can be changed by for example NodeDataLoader
@@ -48,11 +48,14 @@ def load_data(data_name, get_norm=False, inv_target=False):
     target_idx = node_ids[loc]
 
     if inv_target:
+        # full graph train 是用不到的
         # Map global node IDs to type-specific node IDs. This is required for
         # looking up type-specific labels in a minibatch
         inv_target = th.empty((g.num_nodes(),), dtype=th.int64)
         inv_target[target_idx] = th.arange(0, target_idx.shape[0],
                                            dtype=inv_target.dtype) # torch.Size([7262]), 重排target_idx
+        # TODO 高效赋值的一种方法
+        
         return g, num_rels, num_classes, labels, train_idx, test_idx, target_idx, inv_target
     else:
         return g, num_rels, num_classes, labels, train_idx, test_idx, target_idx

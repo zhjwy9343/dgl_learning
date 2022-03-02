@@ -21,18 +21,17 @@ class RGCN(nn.Module):
                                         num_bases, activation=F.relu, self_loop=self_loop,
                                         dropout=dropout))
 
-        # For entity classification, dropout should not be applied to the output layer
-        # TODO entity classification is what kind of a task? 
+        # TODO For entity classification, dropout should not be applied to the output layer, why?
         if not link_pred:
             dropout = 0.
         self.layers.append(RelGraphConv(h_dim, out_dim, num_rels, regularizer,
                                         num_bases, self_loop=self_loop, dropout=dropout))
 
     def forward(self, g, h):
-        if isinstance(g, DGLGraph):
-            blocks = [g] * len(self.layers) # TODO if its not dglGraph 怎么 zip?
+        if isinstance(g, DGLGraph):# for entity.py, full graph , twice conv
+            blocks = [g] * len(self.layers) 
         else:
-            blocks = g
+            blocks = g # for entity_sample.py , mini batch, conv on block[0] and block[1] consecutively
 
         if self.emb is not None:
             h = self.emb(h.squeeze())
